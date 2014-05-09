@@ -1,4 +1,4 @@
-# DEL Neighborhood UPdates 
+# DEL Neighborhood Updates 
 
 Joint work by Jan van Eijck and Bryan Renne
 
