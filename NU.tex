@@ -1,0 +1,898 @@
+\listfiles
+\documentclass[12pt]{article}
+
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{0.5em}
+
+%%
+%% page setup and comments:
+%% - comment out the \def\comments{1} if you do not want comments
+%% - leave the \def\comments{1} uncommented if you do want comments
+%%
+
+\def\comments{1}
+
+%% leave the next few lines below alone
+
+\ifx\comments\undefined
+  % then do normal margins and ignore comments
+  \usepackage[a4paper,margin=4cm,includefoot]{geometry}
+  \newcommand{\XXXcomment}[1]{}
+\else
+  % then do big marginpar margins and insert comments
+  \usepackage[a4paper,margin=.5in,right=2.5in,marginpar=2in,includefoot]{geometry}
+  \newcommand{\XXXcomment}[1]{\marginpar{\color{blue}{\footnotesize #1}}}
+\fi
+
+%%
+%% packages and package-specific settings
+%%
+
+\usepackage{latexsym,amssymb,amsmath,amscd,amsthm,alltt,stmaryrd,graphicx,mathrsfs}
+
+\usepackage{times}
+
+\usepackage{float}
+\floatstyle{boxed}
+\restylefloat{figure}
+\restylefloat{table}
+
+%%
+%% tikz stuff, including custom environment
+%%
+
+\usepackage{tikz}
+\usetikzlibrary{trees,arrows,positioning,patterns,automata,shapes,decorations,decorations.pathmorphing}
+
+\newcommand{\mystretch}{\renewcommand{\arraystretch}{1.5}}
+\newcommand{\normalstretch}{\renewcommand{\arraystretch}{1}}
+
+\newlength{\mysep}
+\setlength{\mysep}{2.7cm}
+\newlength{\mysepCloser}
+\setlength{\mysepCloser}{2cm}
+\newlength{\mysepFarther}
+\setlength{\mysepFarther}{3cm}
+\newlength{\mysepFarthest}
+\setlength{\mysepFarthest}{4cm}
+
+\newlength{\myMinsize}
+\setlength{\myMinsize}{3em}
+\newlength{\myBigger}
+\setlength{\myBigger}{4em}
+\newlength{\myNodeDistance}
+\setlength{\myNodeDistance}{3cm}
+
+\newenvironment{mytikz}[1][0em]{
+\begin{tikzpicture}[>=latex,auto,node distance=\mysep,
+  baseline={([yshift=#1]current bounding box.east)}]
+
+  \normalstretch{}
+
+  \tikzstyle{w}=[draw,circle,thick,minimum size=\myMinsize]
+
+  \tikzstyle{e}=[draw,minimum size=\myMinsize,node distance=\myNodeDistance]
+  
+  \tikzstyle{every edge}=[draw,thick,font=\footnotesize]
+  
+  \tikzstyle{every label}=[font=\footnotesize]
+  
+  \tikzstyle{ev}=[anchor=west,node distance=\myNodeDistance]
+
+  \tikzstyle{bigger}=[minimum size=\myBigger]
+
+  \tikzstyle{closer}=[node distance=\mysepCloser]  
+
+  \tikzstyle{farther}=[node distance=\mysepFarther]
+
+  \tikzstyle{farthest}=[node distance=\mysepFarthest]
+
+  \tikzstyle{l}=[node distance=\myNodeDistance]
+}{\mystretch{}\end{tikzpicture}}
+
+%%
+%% theorem environments
+%%
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{question}[theorem]{Question}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem{remark}[theorem]{Remark}
+
+%%
+%% custom commands
+%%
+
+\newcommand{\Nat}{\mathbb{N}}  % natural numbers
+\newcommand{\Rat}{\mathbb{Q}}  % rational numbers
+\newcommand{\Ree}{\mathbb{R}}  % real numbers
+\newcommand{\Int}{\mathbb{Z}}  % integers
+
+\newcommand{\pow}{{\cal P}}    % powerset
+
+\newcommand{\M}{{\cal M}}      % caligraphic model M
+\newcommand{\N}{{\cal N}}      % caligraphic model N
+
+\newcommand{\Prop}{{\bf P}}    % propositional letters
+
+\newcommand{\Lang}{{\cal L}}   % language
+
+\newcommand{\conv}{\check{\ }} % dual modality
+
+\newcommand{\pre}{\mathsf{pre}}
+\newcommand{\Pref}{{\bf P}}
+
+\newcommand{\A}{{\bf A}}
+\newcommand{\B}{{\bf B}}
+
+\newcommand{\Actm}{\mathfrak{A}}   % action models
+
+\newcommand{\KB}{{\mathsf{KB}}}                        % base theory
+\newcommand{\KBlt}{{\mathsf{KB}^{\mathsf{<.5}}}}       % theory for c<.5
+\newcommand{\KBeq}{{\mathsf{KB}^{\mathsf{=.5}}}}       % theory for c=.5
+\newcommand{\KBeqm}{{\mathsf{KB}^{\mathsf{=.5}}_{-}}}  % theory for c=.5 without (M)
+\newcommand{\KBgt}{{\mathsf{KB}^{\mathsf{>.5}}}}       % theory for c>.5
+\newcommand{\KBgeq}{{\mathsf{KB}^{\mathsf{\geq.5}}}}   % theory for c>=.5
+\newcommand{\KBc}{{\mathsf{KB}^{\mathsf{>}c}}}         % theory for c
+
+\newcommand{\KBmyc}[1]{{\mathsf{KB}^{\mathsf{>{#1}}}}} % theory for specific c = #1
+
+
+\newcommand{\Clt}{{\mathcal{C}^{\mathsf{<.5}}}}    % neigh. models for c<.5
+\newcommand{\Ceq}{{\mathcal{C}^{\mathsf{=.5}}}}    % for c=.5
+\newcommand{\Cgt}{{\mathcal{C}^{\mathsf{>.5}}}}    % for c>.5
+
+\newcommand{\Rel}[1]{\stackrel{#1}{\Longrightarrow}}         % #1 over \Longrightarrow
+
+\newcommand{\sem}[1]{\llbracket{#1}\rrbracket}               % [[ #1 ]]
+
+\newcommand{\modelsn}{\models_{\mathsf{n}}}                  % \models_n
+\newcommand{\semn}[1]{\llbracket{#1}\rrbracket_{\mathsf{n}}} % [[ #1 ]]_n
+
+\newcommand{\modelsp}{\models_{\mathsf{p}}}                  % \models_p
+\newcommand{\semp}[1]{\llbracket{#1}\rrbracket_{\mathsf{p}}} % [[ #1 ]]_p
+
+%%
+%% author, title, &c
+%%
+
+\newcommand{\ourtitle}{Belief Revision By Neighborhood Update}
+
+\newcommand{\jan}{Jan van Eijck}
+
+\newcommand{\janAffiliation}{CWI \&\ ILLC, Amsterdam}
+
+\newcommand{\bryan}{Bryan Renne}
+
+\newcommand{\bryanAffiliation}{ILLC, University of Amsterdam}
+
+\newcommand{\bryanFunding}{Funded by an Innovational Research
+  Incentives Scheme Veni grant from the Netherlands Organisation for
+  Scientific Research (NWO).}
+
+\title{\ourtitle{}} 
+
+\author{\jan{}\\{}{\small\janAffiliation{}} \and
+  \bryan{}\footnote{\bryanFunding{}}\\{}{\small\bryanAffiliation{}}}
+
+\usepackage[pdftex,
+            bookmarks=true,
+            bookmarksnumbered=true,
+            pdfborder={0 0 0},
+            plainpages=false,
+            pdfpagelabels]{hyperref}
+
+\hypersetup{ 
+  pdfauthor={\jan{}, \bryan{}}, 
+  pdftitle={\ourtitle{}}
+}
+
+%%
+%% beginning of paper
+%%
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  \noindent 
+  We study update of neighborhood models for belief with neighborhood
+  models for communication and change. Our main motivation for this is
+  that the update construction for such model is better behaved than
+  the product update of Kripke models for belief with Kripke event
+  models.
+\end{abstract}
+
+\section{Introduction}
+
+\ldots 
+
+\section{Epistemic Neighborhood Models} 
+
+Let $A$ be a finite set of agents and $\Prop$ a set of basic propositions. 
+
+\begin{definition} 
+  An \emph{epistemic neighborhood model} is a structure
+  \[
+  \M=(W,R,V,N)
+  \]
+  satisfying the following.
+  \begin{itemize}
+  \item $(W,R,V)$ is a finite multi-agent $\mathsf{S5}$ Kripke model, 
+    i.e., $W$ is an finite set of worlds, $R$ assigns to every agent 
+    $a$ an equivalence relation $R_a$ on $W$, and $V$ assigns to  
+    every $w \in W$ a subset of the set of basic propositions $\Prop$. 
+    We let 
+    \[
+    [w]_a:=\{v\in W\mid wR_av\}
+    \]
+    denote the $a$-equivalence class of world $w$.  This is the
+    set of worlds $a$ cannot distinguish from $w$.
+
+  \item $N : A\times W \to \pow(\pow(W))$ is a \emph{neighborhood
+      function} that assigns to each agent $a\in A$ and world $w\in W$
+    a collection $N_a(w)$ of sets of worlds---each such set called a
+    \emph{neighborhood} of $w$---subject to the following conditions.
+    \begin{description}
+    \item[(kbc)] $\forall X \in N_a(w) : X \subseteq [w]_a$.
+
+    \item[(bf)] $\emptyset\notin N_a(w)$.
+      
+    \item[(n)] $[w]_a\in N_a(w)$.
+      
+    \item[(a)] $\forall v \in [w]_a : N_a(v) = N_a(w)$.
+
+    \item[(kbm)] $\forall X \subseteq Y \subseteq [w]_a : 
+      \text{ if } X \in N_a(w) \text{, then } Y \in N_a(w)$.
+   \end{description}
+  \end{itemize}
+  A \emph{pointed epistemic neighborhood model} is a pair $(\M,w)$
+  consisting of an epistemic neighborhood model $\M$ and a world $w$
+  in the set of worlds of $\M$. 
+\end{definition}
+
+An epistemic neighborhood model is a variation of a neighborhood model that
+includes an epistemic component $R_a$ for each agent $a$.
+Intuitively, $[w]_a$ is the set of worlds agent $a$ knows to be
+possible at $w$ and each $X\in N_a(w)$ represents a proposition that
+the agent believes at $w$.  The condition that $R_a$ be an equivalence
+relation ensures that knowledge is closed under logical consequence,
+veridical (i.e., only true things can be known), positive
+introspective (i.e., the agent knows what she knows), and negative
+introspective (i.e., the agent knows what she does not know).
+
+Property (kbc) ensures that the agent does not believe a proposition
+$X\subseteq W$ that she knows to be false: if $X$ contains a world in
+$w'\in(W-[w]_a)$ that the agent knows is not possible with respect to
+the actual world $w$, then she knows that $X$ cannot be the case and
+hence she does not believe $X$.  Property (bf) ensures that no logical
+falsehood is believed, while Property (n) ensures that every logical
+truth is believed.  Property (a) ensures that if $X$ is believed, then
+it is known that $X$ is believed.  Property (kbm) says that belief is
+monotonic: if an agent believes $X$, then she believes all
+propositions $Y\supseteq X$ that follow from $X$.
+
+\begin{definition}
+  The language $\Lang_\KB$ of \emph{multi-agent knowledge and belief}
+  is defined by the following grammar.
+  \begin{eqnarray*}
+    \phi & ::= & 
+    \top \mid p \mid \neg\phi \mid \phi\land\phi \mid
+    K_a\phi \mid B_a\phi
+    \\
+    &&
+    \text{\footnotesize 
+      $p\in\Prop$,
+      $a\in A$
+    }
+  \end{eqnarray*}
+  We adopt the usual abbreviations for other Boolean connectives and
+  define the dual operators $\check K_a:=\lnot K_a\lnot$ and $\check
+  B_a:=\lnot B_a\lnot$.
+\end{definition}
+
+We now turn to the definition of truth for the language $\Lang_\KB$.
+
+\begin{definition}
+  \label{definition:LKB-truth}
+  Let $\M = (W,R,V,N)$ be an epistemic neighborhood model.  We define
+  a binary truth relation $\modelsn$ between a pointed epistemic
+  neighborhood model $(\M,w)$ and $\Lang_\KB$-formulas and a function
+  $\semn{\cdot}^\M:\Lang_\KB\to \pow(W)$ as follows.
+  \begin{eqnarray*} 
+    \semn{\phi}^\M & := & \{v\in W\mid \M,v\modelsn\phi\}
+    \\
+    \M, w \modelsn p & \text{ iff } & p \in V(w) 
+    \\
+    \M, w \modelsn \neg \phi & \text{ iff } & \M, w \not\modelsn \phi 
+    \\
+    \M, w \modelsn \phi\land\psi  & \text{ iff } 
+    & \M, w \modelsn \phi \text{ and } \M, w \modelsn \psi
+    \\
+    \M, w \modelsn K_a \phi  & \text{ iff } & 
+    [w]_a\subseteq\semn{\phi}^\M
+    \\
+    \M, w \modelsn B_a \phi  & \text{ iff } &
+    [w]_a\cap \semn{\phi}^\M \in N_a(w)
+  \end{eqnarray*}
+  Validity of $\phi\in\Lang_\KB$ in an epistemic neighborhood model
+  $\M$, written $\M\modelsn\phi$, means that $\M,w\modelsn\phi$ for
+  each world $w\in W$.  Validity of $\phi\in\Lang_\KB$, written
+  $\modelsn\phi$, means that $\M\modelsn\phi$ for each epistemic
+  neighborhood model $\M$.  For a class $\mathcal{C}$ of epistemic
+  neighborhood models, we write $\mathcal{C}\modelsn\phi$ to mean that
+  $\M\modelsn\phi$ for each $\M\in\mathcal{C}$.
+\end{definition}
+
+Intuitively, $K_a\phi$ is true at $w$ iff $\phi$ holds at all worlds
+epistemically possible with respect to $w$, and $B_a\phi$ holds at $w$
+iff the epistemically possible $\phi$-worlds make up a neighborhood of
+$w$.  Note that it follows from this definition that the dual for
+belief $\check{B}_a \phi$ is true at $w$ iff
+$[w]_a\cap\semn{\neg\phi}^\M\notin N_a(w)$.
+
+\section{Updates on Epistemic Neighborhood Models} 
+
+Action models over this language are defined by: 
+
+\begin{definition} 
+  Given a language $L$, an \emph{epistemic neighborhood action model}
+  is a structure $(\bar{W},\bar{R},\pre,\bar{N})$ satisfying the
+  following.
+  \begin{itemize}
+  \item $\bar{W}$ is a nonempty finite set of whose members are called
+    ``events.''
+
+  \item $\bar{R}$ is a function that assigns to every agent $a \in A$
+    an equivalence relation $\bar{R}_a$ on $\bar{E}$.
+
+  \item $\pre:\bar{E}\to L$ is a \emph{precondition function} that
+    maps each event to an $L$-formula.
+
+  \item $\bar{N} : A\times \bar{E} \to \pow(\pow(\bar{E}))$ is a \emph{neighborhood
+      function} that assigns to each agent $a\in A$ and event $e\in \bar{E}$
+    a collection $\bar{N}_a(e)$ of sets of events, subject to the following
+    conditions.
+    \begin{description}
+    \item[(kbc)] $\forall X \in \bar{N}_a(e) : X \subseteq [e]_a$.
+
+    \item[(bf)] $\emptyset\notin \bar{N}_a(e)$.
+      
+    \item[(n)] $[e]_a\in \bar{N}_a(e)$.
+      
+    \item[(a)] $\forall d \in [e]_a : \bar{N}_a(d) = \bar{N}_a(e)$.
+
+    \item[(kbm)] $\forall X \subseteq Y \subseteq [e]_a : \text{ if } X
+      \in \bar{N}_a(e) \text{, then } Y \in \bar{N}_a(e)$.
+    \end{description}
+  \end{itemize} A \emph{pointed neighborhood action model} is a pair
+  $(\A,e)$ consisting of an neighborhood action model $\A$ and an
+  event $e$ in the set of events of $\A$.  We let $\Actm(L)$ denote
+  the set of action models with preconditions in the language $L$, and
+  we let $\Actm_*(L)$ denote the set of pointed action models with
+  preconditions in the language $L$.
+\end{definition}
+
+\begin{definition}
+  The language $\Lang_\KB^U$ of \emph{multi-agent knowledge and belief
+    with updates} is an extension of $\Lang_\KB$ defined by the
+  following recursive grammar.
+  \begin{eqnarray*}
+    \phi & ::= & 
+    \top \mid p \mid \neg\phi \mid \phi\land\phi \mid
+    K_a\phi \mid B_a\phi \mid [\A,e]\phi
+    \\
+    &&
+    \text{\footnotesize 
+      $p\in\Prop$,
+      $a\in A$,
+      $(\A,e)\in\Actm_*(\Lang_\KB^U)$
+    }
+  \end{eqnarray*}
+\end{definition}
+
+\begin{definition}
+  \label{definition:LKBU-truth}
+  Let $\M = (W,R,V,N)$ be an epistemic neighborhood model.  We define a
+  binary truth relation $\modelsn$ between a pointed epistemic
+  neighborhood model $(\M,w)$ and $\Lang_\KB^U$-formulas as the
+  extension of the relation from Definition~\ref{definition:LKB-truth}
+  obtained by adding the following clause.
+  \begin{eqnarray*} 
+    \M, w \modelsn [\A,e]\phi & \text{ iff } &
+    \M, w \not\modelsn \pre(e) \text{ or }
+    \M[\A], (w,e) \modelsn\phi
+  \end{eqnarray*}
+  where we define $\M[\A]:=(W',R',V',N')$ in terms of the action model
+  $\A=(\bar{W},\bar{R},\pre,\bar{N})$ as follows:
+  \begin{itemize}
+  \item $W' := \{(w,e)\in W\times\bar{W}\mid \M , w \models \pre(e) \}$,
+
+  \item $R'_a:=
+    \{ ((w,e),(v,f))\in W'\times W' \mid
+    (w,v)\in R_a \text{ and } (e,f)\in\bar{R}_a \}$,
+
+  \item $V'(w,e) := V(w)$, and
+
+  \item $N': A\times W' \to \pow(\pow(W'))$ is given by 
+    \[
+    N'_a(w,e) = \{ (X \times Y) \cap W' \mid X \in N_a (w) \text{ and } Y \in
+    \bar{N}_a(e) \} \enspace.
+    \]
+  \end{itemize}
+  Note that, as in the definition of $N'$ above, we often write a
+  function $f$ applied to a pair $(a,b)$ as $f(a,b)$ instead of the
+  more cumbersome $f((a,b))$.  We say that a pointed neighborhood
+  action model $(\A,e)$ is \emph{executable} at $(\M,w)$ to mean that
+  $\M,w\modelsn\pre(e)$.  We verify in
+  Theorem~\ref{theorem:well-defined} that $\M[\A]$ is an epistemic
+  neighborhood model whenever $(\A,e)$ is executable at $(\M,w)$.
+  This ensures that the above is well-defined.  The various notions of
+  validity for $\Lang_\KB^U$-formulas are defined as were the various
+  notions for $\Lang_\KB$-formulas.
+\end{definition}
+
+\begin{theorem}
+  \label{theorem:well-defined}
+  Let $(\M,w)$ and $(\A,e)$ be given as in
+  Definition~\ref{definition:LKBU-truth}.  If $(\A,e)$ is executable
+  at $(\M,w)$, then $\M[\A]$ is an epistemic neighborhood model.
+\end{theorem}
+\begin{proof}
+  Since $(\A,e)$ is executable at $(\M,w)$, it follows that $W'$ is
+  nonempty.  Since $R_a$ and $\bar{R}_a$ are equivalence relations,
+  $R'_a$ is an equivalence relation.  So all that remains is to verify
+  that $N'$ satisfies (kbc), (bf), (n), (a), and (kbm).
+
+  For (kbc), let $Z \in N'_a(w,e)$. Then $Z$ has the form $(X \times Y)
+  \cap W'$ for some $X \in N_a(w), Y \in \bar{N}_a(e)$. Since $\M$ and
+  $\A$ both satisfy (kbc), we have $X \subseteq [w]_a$ and $Y \subseteq
+  [e]_a$.  By the product construction on $R'_a$, we have $[(w,e)]_a =
+  ([w]_a \times [e]_a) \cap W'$. It follows that $Z \subseteq
+  [(w,e)]_a$.
+
+  For (bf), the result follows because $W'$ is nonempty.
+
+  For (n), take $(w,e) \in W'$. Then $[(w,e)]_a$ equals $([w]_a \times
+  [e]_a) \cap W'$.  Since $\M$ and $\A$ satisfy (n), we have $([w]_a
+  \times [e]_a) \cap W' \in N'_a(w,e)$.
+
+  For (a), take $(w',e') \in [(w,e)]_a$. Then $w' \in [w]_a$ and $e'
+  \in [e]_a$.  Since $\M$ and $\A$ satisfy (a), $N_a(w') = N_a(w)$ and
+  $\bar{N}_a(e') = \bar{N}_a(e)$.  Therefore $N'_a (w',e') = N'_a
+  (w,e)$.
+ 
+  For (kbm), take $X \subseteq Y \subseteq [(w,e)]_a$ and suppose $X \in
+  N_a(w,e)$. Then there are $U \in N_a(w)$ and $V \in N_a(e)$
+  satisfying $N_a(w,e) = (U\times V) \cap W'$, and therefore $Y
+  \supseteq (U\times V) \cap W'$. Since $\M$ and $\A$ satisfy (kbm), $Y
+  \in N_a(w,e)$.
+\end{proof}
+
+What the theorem tells us is that the situation here is markedly
+different from the situation of updating KD45 doxastic models with
+KD45 event models. Since the seriality requirement on KD45 models is
+not universal Horn, it is not preserved under product update.
+Therefore, updating a static KD45 model with an update KD45 model does
+not guarantee a result where the accessibilities are again KD45.
+
+Neighborhood models for belief are better behaved under product update 
+than KD45 models for belief. 
+
+\section{Axiomatic Theories}
+
+\subsection{The Basic Theory \texorpdfstring{$\KB$}{KB}}
+
+\begin{definition}
+  The theory $\KB$ is defined in Table~\ref{table:KB}.  All
+  formulas are in the language $\Lang_\KB$.
+\end{definition}
+
+\begin{table}[ht]
+  \begin{center}
+    \textsc{Axiom Schemes}\\[.4em]
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}[t]{cl}
+      (CL) &
+      Schemes of Classical Propositional Logic
+      \\
+      (KS5) &
+      $\mathsf{S5}$ axiom schemes for each $K_a$
+      \\
+      (KBC) &
+      $K_a\phi\to B_a\phi$
+      \\
+      (BF) &
+      $\lnot B_a\bot$
+      \\
+      (N) &
+      $B_a\top$
+      \\
+      (Ap) &
+      $B_a\phi\to K_aB_a\phi$
+      \\
+      (An) &
+      $\lnot B_a\phi\to K_a\lnot B_a\phi$
+      \\
+      (KBM) &
+      $K_a(\phi\to\psi)\to(B_a\phi\to B_a\psi)$
+    \end{tabular}
+    \renewcommand{\arraystretch}{1.0}
+    \\[1em]
+    \textsc{Rules}\vspace{-.5em}
+    \[
+    \begin{array}{c}
+      \phi\to\psi \quad \phi
+      \\\hline
+      \psi
+    \end{array}\;\text{\footnotesize(MP)}
+    \qquad
+    \begin{array}{c}
+      \phi
+      \\\hline
+      K_a\phi
+    \end{array}\;\text{\footnotesize(MN)}
+    \]
+  \end{center}
+  \caption{The theory $\KB$}
+  \label{table:KB}
+\end{table}
+
+The following result, originally proved in \cite{EijRen14:BEPL}, shows
+that if we restrict attention to provable statements whose only
+modality is single-agent belief $B_a\phi$, then $\KB$ is an extension
+of the minimal modal logic $\mathsf{EMN45}+\lnot
+B_a\bot=\mathsf{EMN45}+(\text{BF})$ obtained by adding
+$\mathsf{S5}$-knowledge and the knowledge-belief connection principles
+(KBC), (Ap), (An), and (KBM).\footnote{$\mathsf{EMN45}+(\text{BF})$ is
+  the logic of single-agent belief (without knowledge) having Schemes
+  (CL) (Table~\ref{table:KB}), M
+  (Prop.~\ref{prop:KBgt-derivables}\eqref{derivables:Band-andB}), (N)
+  (Table~\ref{table:KB}), 4
+  (Prop.~\ref{prop:KBgt-derivables}\eqref{derivables:pos-belief}), 5
+  (Prop.~\ref{prop:KBgt-derivables}\eqref{derivables:neg-belief}), and
+  (BF) (Table~\ref{table:KB}) along with Rules (MP)
+  (Table~\ref{table:KB}) and RE
+  (Prop.~\ref{prop:KBgt-derivables}\eqref{derivables:RE}). This is a
+  ``monotonic'' system of modal logic satisfying positive and negative
+  belief introspection (4 and 5) and the property (BF) that falsehood
+  $\bot$ is not believed. See \cite[Ch.~8]{Chellas:ml} for details on
+  naming minimal modal logics.}
+
+\begin{proposition}[$\KB$ Derivables; \cite{EijRen14:BEPL}]
+  \label{prop:KBgt-derivables}
+  We have each of the following.
+  \begin{enumerate}
+  \item $\KB\vdash B_a(\phi\land\psi)\to(B_a\phi\land B_a\psi)$.
+    \label{derivables:Band-andB}
+
+    This is ``Scheme M'' \cite[Ch.~8]{Chellas:ml}.
+
+  \item $\KB\vdash K_a\phi\land B_a\psi\to B_a(\phi\land\psi)$.
+    \label{derivables:andB-Band}
+
+    If the antecedent $K_a\phi$ were replaced by $B_a\phi$, then we
+    would obtain ``Scheme C'' \cite[Ch.~8]{Chellas:ml}.  So we do not
+    have Scheme C outright but instead a knowledge-weakened version:
+    in order to conclude belief of a conjunction from belief of one of
+    the conjuncts, the other conjunct must be known (and not merely
+    believed, as is required by the stronger, non-$\KB$-provable
+    Scheme C).
+
+  \item $\KB\vdash K_a(\phi\to\psi)\to(\check B_a\phi\to\check B_a\psi)$.
+    \label{derivables:check-M}
+
+    This is the dual version of our (KBM).
+
+    \item $\KB\vdash B_a\phi\to B_aB_a\phi$.
+    \label{derivables:pos-belief}
+
+    This is ``Scheme 4'' \cite[Ch.~8]{Chellas:ml}.
+
+  \item $\KB\vdash \lnot B_a\phi\to B_a\lnot B_a\phi$.
+    \label{derivables:neg-belief}
+
+    This is ``Scheme 5'' \cite[Ch.~8]{Chellas:ml}.
+
+  \item $\KB\vdash B_a\phi\leftrightarrow K_aB_a\phi$.
+    \label{derivables:B-KB}
+
+    This says that belief and knowledge of belief are equivalent.
+
+  \item $\KB\vdash \lnot B_a\phi\leftrightarrow K_a\lnot B_a\phi$.
+    \label{derivables:nB-KnB}
+
+    This says that non-belief and knowledge of non-belief are equivalent.
+
+  \item $\KB\vdash\phi$ implies $\KB\vdash B_a\phi$.
+    \label{derivables:B-nec}
+
+    This is the rule of Modus Ponens (or Modal Necessitation),
+    sometimes called ``Rule RN'' \cite[Ch.~8]{Chellas:ml}.
+
+  \item $\KB\vdash\phi\to\psi$ implies $\KB\vdash B_a\phi\to B_a\psi$.
+    \label{derivables:Bimp}
+
+    This is ``Rule RM'' \cite[Ch.~8]{Chellas:ml}.
+
+  \item $\KB\vdash\phi\to\psi$ implies $\KB\vdash\check
+    B_a\phi\to\check B_a\psi$.
+    \label{derivables:check-Bimp}
+    
+    This is the dual version of RM.
+    
+  \item $\KB\vdash\phi\leftrightarrow\psi$ implies
+    $\KB\vdash B_a\phi\leftrightarrow B_a\psi$.
+    \label{derivables:RE}
+
+    This is ``Rule RE'' \cite[Ch.~8]{Chellas:ml}.
+
+  \item $\KB\vdash\phi\to\bot$ implies $\KB\vdash\lnot
+    B_a\phi$. \label{derivables:GBF}
+
+    This says that no self-contradictory sentence is believed.  This
+    may be viewed as a certain generalization of (BF)
+    (Table~\ref{table:KB}).
+  \end{enumerate}
+\end{proposition}
+
+\begin{theorem}[$\KB$ Soundness and Completeness; \cite{EijRen14:BEPL}]
+  \label{theorem:KB-neighborhood-soundness}
+  $\KB$ is sound and complete with respect to the class $\mathcal{C}$ of
+  epistemic neighborhood models:
+  \[
+  \forall\phi\in\Lang_\KB:\quad\KB\vdash\phi
+  \quad\Leftrightarrow\quad
+  \mathcal{C}\modelsn\phi
+  \enspace.
+  \]
+  Also, every satisfiable $\KB$-formula is satisfiable in a finite
+  epistemic neighborhood model.
+\end{theorem}
+
+\subsection{The Theory with Updates
+  \texorpdfstring{$\KB^U$}{KBU}}
+
+\begin{definition}
+  The theory $\KB^U$ is defined in Table~\ref{table:KBU}.  All
+  formulas are in the language $\Lang_\KB^U$. Schemes (RA), (RN), (RC),
+  (RK), and (RB) are called \emph{reduction schemes} (or
+  \emph{reduction axioms}).
+\end{definition}
+
+\begin{table}[ht]
+  \begin{center}
+    \textsc{Axiom Schemes}\\[.4em]
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}[t]{cl}
+      ($\KB$) & 
+      Schemes of $\KB$ (Table~\ref{table:KB})
+      \\
+      (RA) &
+      $[\A,e]p \leftrightarrow(\,\pre(e)\to p\,)$ for
+      $p\in\{\top\}\cup\Prop$
+      \\
+      (RN) &
+      $[\A,e]\lnot\phi \leftrightarrow(\,\pre(e)\to \lnot[\A,e]\phi\,)$
+      \\
+      (RC) &
+      $[\A,e](\phi\land\psi) \leftrightarrow(\,[\A,e]\phi\land[\A,e]\psi\,)$
+      \\
+      (RK) &
+      $\textstyle
+      [\A,e]K_a\phi \leftrightarrow
+      (\,\pre(e)\to \bigwedge_{(e,f)\in\bar{R}_a}K_a[\A,f]\phi\,)$
+      \\
+      (RB) &
+      $\textstyle
+      [\A,e]B_a\phi \leftrightarrow
+      (\,\pre(e)\to \bigvee_{Y\in\bar{N}_a(e)}
+      B_a(\bigwedge_{f\in
+        Y}[\A,f]\phi)\,)$
+    \end{tabular}
+    \renewcommand{\arraystretch}{1.0}
+    \\[1em]
+    \textsc{Rules}\vspace{-.5em}
+    \[
+    \begin{array}{c}
+      \phi\to\psi \quad \phi
+      \\\hline
+      \psi
+    \end{array}\;\text{\footnotesize(MP)}
+    \qquad
+    \begin{array}{c}
+      \phi
+      \\\hline
+      K_a\phi
+    \end{array}\;\text{\footnotesize(MN)}
+    \qquad
+    \begin{array}{c}
+      \phi
+      \\\hline
+      [\A,e]\phi
+    \end{array}\;\text{\footnotesize(UN)}
+    \]
+  \end{center}
+  \caption{The theory $\KB^U$}
+  \label{table:KBU}
+\end{table}
+
+\begin{theorem}[Reduction]
+  \label{theorem:reduction}
+  For each $\phi\in\Lang_\KB^U$, there exists
+  $\phi^\circ\in\Lang_\KB$ such that
+  \[
+  \KB^U\vdash\phi\leftrightarrow\phi^\circ
+  \enspace.
+  \]
+\end{theorem}
+\begin{proof}
+  Let $L_0:=\Lang_\KB$.  Once $L_i$ is defined, define $L_{i+1}$ by
+  \begin{eqnarray*}
+    \phi_{i+1} & ::= & 
+    \phi_i \mid \neg\phi_{i+1} \mid \phi_{i+1}\land\phi_{i+1} \mid
+    K_a\phi_{i+1} \mid B_a\phi_{i+1} \mid [\A,e]\phi_{i+1}
+    \\
+    &&
+    \text{\footnotesize 
+      $\phi_i\in L_i$,
+      $a\in A$,
+      $(\A,e)\in\Actm_*(L_i)$
+    }
+  \end{eqnarray*}
+  Observe that $i\leq j$ implies $L_i\subseteq
+  L_j\subseteq\Lang_\KB^U$ and
+  $\Actm_*(L_i)\subseteq\Actm_*(L_j)\subseteq\Actm_*(\Lang_\KB^U)$.  It
+  follows that $\Lang_\KB^U=\bigcup_{i\in\mathbb{N}}L_i$.  We define a
+  dictionary ordering on $\Lang_\KB^U$ in a few steps.  First, for
+  each $\phi\in\Lang_\KB^U$, let $d(\phi)$ denote the
+  \emph{non--precondition-recursing formation depth} of $\phi$ and let
+  $D(\phi)$ denote the \emph{post-action non--precondition-recursing
+    formation depth} of $\phi$.  These are defined as follows.
+  \[
+  \renewcommand{\arraystretch}{1.3}
+  \begin{array}[t]{rcl}
+    d(p) &:=& 0 \text{ for } p\in\{\top\}\cup\Prop \\
+    d(\lnot\phi) &:=& 1 + d(\phi) \\
+    d(\phi\land\psi) &:=& 1 + \max\{d(\phi),d(\psi)\} \\
+    d(K_a\phi) &:=& 1 + d(\phi) \\
+    d(B_a\phi) &:=& 1 + d(\phi) \\
+    d([\A,e]\phi) &:=& 1 + d(\phi)
+  \end{array}
+  \begin{array}[t]{rcl}
+    D(p) &:=& 0 \text{ for } p\in\{\top\}\cup\Prop \\
+    D(\lnot\phi) &:=& D(\phi) \\
+    D(\phi\land\psi) &:=& \max\{D(\phi),D(\psi)\} \\
+    D(K_a\phi) &:=& D(\phi) \\
+    D(B_a\phi) &:=& D(\phi) \\
+    D([\A,e]\phi) &:=& d(\phi)
+  \end{array}
+  \renewcommand{\arraystretch}{1.0}
+  \]
+  $d(\phi)$ is the maximum number of recursive steps required to
+  construct $\phi$ without counting steps required to construct
+  preconditions.  $D(\phi)$ is the maximum number of recursive steps
+  required to construct that part of $\phi$ that occurs just after a
+  neighborhood action model modality is first encountered in the
+  recursive breakdown of $\phi$.  We let $\ell(\phi)$ denote the
+  \emph{recursion level} of $\phi$: this is the smallest
+  $i\in\mathbb{N}$ satisfying $\phi\in L_i$.  Finally, we order
+  $\Lang_\KB^U$-formulas as follows: $\phi<\psi$ means that either
+  $\ell(\phi)<\ell(\psi)$ or else both $\ell(\phi)=\ell(\psi)$ and
+  $D(\phi)<D(\psi)$.  The ordering $<$ well-orders $\Lang_\KB^U$.
+
+  It is not difficult to prove that for each
+  $(\A,e)\in\Actm_*(\Lang_\KB^U)$ and $\phi\in\Lang_\KB^U$, we have
+  $\ell(\pre(e))<\ell([\A,e]\phi)$ and therefore $\pre(e)<[\A,e]\phi$.
+  So for each reduction axiom, if $\phi_{\mathsf{L}}$ is the formula
+  on the left side of the biconditional and $\phi_{\mathsf{R}}$ is the
+  formula on the right side of the biconditional, then it can be shown
+  that $\phi_{\mathsf{R}}<\phi_{\mathsf{L}}$.  We therefore may define
+  $\circ:\Lang_\KB^U\to\Lang_\KB$ as follows:
+  \[
+  \renewcommand{\arraystretch}{1.3}
+  \begin{array}[t]{lcl}
+    p^\circ &:=& p \text{ for } p\in\{\top\}\cup\Prop \\
+    (\lnot\phi)^\circ &:=& \lnot\phi^\circ \\
+    (\phi\land\psi)^\circ &:=& \phi^\circ\land\psi^\circ \\
+    (K_a\phi)^\circ &:=& K_a\phi^\circ \\
+    (B_a\phi)^\circ &:=& B_a\phi^\circ \\
+    ([\A,e]p)^\circ &:=& 
+    \textstyle
+    \pre(e)^\circ\to p \text{ for }  p\in\{\top\}\cup\Prop 
+    \\
+    ([\A,e]\lnot\phi)^\circ &:=& 
+    \pre(e)^\circ\to \lnot([\A,e]\phi)^\circ
+    \\
+    ([\A,e](\phi\land\psi))^\circ &:=&
+    ([\A,e]\phi)^\circ\land([\A,e]\psi)^\circ
+    \\
+    ([\A,e]K_a\phi)^\circ &:=& 
+    \textstyle
+    \pre(e)^\circ\to \bigwedge_{(e,f)\in\bar{R}_a}K_a([\A,e]\phi)^\circ
+    \\
+    ([\A,e]B_a\phi)^\circ &:=& 
+    \textstyle
+    \pre(e)^\circ\to
+    \bigvee_{Y\in\bar{N}_a(e)} B_a(\bigwedge_{f\in Y}([\A,f]\phi)^\circ)
+    \\
+    ([\A,e][\B,f]\phi)^\circ &:=&
+    ([\A,e]([\B,f]\phi)^\circ)^\circ
+  \end{array}
+  \renewcommand{\arraystretch}{1.0}
+  \]
+  Making use of the well-ordering $<$, the reduction axioms,
+  classical reasoning, and the rule (UN), the result follows.
+\end{proof}
+
+\begin{theorem}[$\KB^U$ Soundness and Completeness]
+  $\KB^U$ is sound and complete with respect to the class
+  $\mathcal{C}$ of epistemic neighborhood models:
+  \[
+  \forall\phi\in\Lang_\KB^U:\quad\KB^U\vdash\phi
+  \quad\Leftrightarrow\quad
+  \mathcal{C}\modelsn\phi
+  \enspace.
+  \]
+\end{theorem}
+\begin{proof}
+  \XXXcomment{BR: insert proof of (RB) soundness. Fix axiom (RB).}
+  For soundness, it suffices by
+  Theorem~\ref{theorem:KB-neighborhood-soundness} to show that each of
+  the reduction axioms is sound and the rule (UN) preserves soundness.
+  Most arguments for most of the reduction axioms and for (UN) are
+  standard \cite{DitHoeKoo06:del}.  We only consider the novel case:
+  the reduction axiom (RB).  That is, we argue that
+  \[
+  \textstyle \modelsn 
+  \begin{array}[t]{l}
+    [\A,e]B_a\phi \leftrightarrow 
+    (\,\pre(e)\to
+    \bigvee_{Y\in\bar{N}_a(e)} B_a(\bigwedge_{f\in Y}[\A,f]\phi)\,) \enspace.
+  \end{array}
+  \]
+  Right to left: assume $M,w\modelsn[\A,e]B_a\phi$.  If
+  $\M,w\not\modelsn\pre(e)$, then the right hand side of the above
+  biconditional follows, so let us assume further that
+  $\M,w\modelsn\pre(e)$. By Definition~\ref{definition:LKBU-truth}, our
+  assumption $\M,w\modelsn[\A,e]B_a\phi$ implies that there exists
+  $X\in N_a(w)$ and $Y\in\bar{N}_a(e)$ such that
+  \[
+  \semn{\phi}\cap[w,e]=(X\times Y)\cap W'\enspace,
+  \]
+  where $W'$ is given as in Definition~\ref{definition:LKBU-truth}.
+
+  % XXX; fill in argument
+
+  Completeness follows by Reduction (Theorem~\ref{theorem:reduction})
+  and soundness and completeness of $\KB$
+  (Theorem~\ref{theorem:KB-neighborhood-soundness}).
+\end{proof}
+
+\section{Examples} 
+
+\ldots 
+
+\section{Some Comparisons} 
+
+\ldots 
+
+\section{Conclusion and Further Work} 
+
+\ldots 
+
+\paragraph{Acknowledgements} 
+
+Thanks to \ldots 
+
+\bibliographystyle{alpha}
+\bibliography{NU}
+
+\end{document} 
